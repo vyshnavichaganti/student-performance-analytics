@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Performance Predictor</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #1D6FEB;
+    --blue-dark: #0A1628;
+    --blue-light: #EBF3FF;
+    --green: #10B981;
+    --yellow: #F59E0B;
+    --red: #EF4444;
+    --gray: #64748B;
+    --border: rgba(29,111,235,0.12);
+    --white: #FFFFFF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #F8FAFF; color: var(--blue-dark);
+    min-height: 100vh;
+  }
+  header {
+    background: white; border-bottom: 1px solid var(--border);
+    padding: 0 40px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 20px rgba(10,22,40,0.06);
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 20px; font-weight: 800; color: var(--blue-dark);
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--blue), #4A9FFF);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .logo span { color: var(--blue); }
+  .badge {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 50px;
+    font-size: 12px; font-weight: 600; color: var(--green);
+  }
+  .badge::before {
+    content: ''; width: 7px; height: 7px;
+    background: var(--green); border-radius: 50%;
+    animation: blink 2s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+  .hero {
+    text-align: center; padding: 48px 20px 32px;
+    background: linear-gradient(180deg, white 0%, #F8FAFF 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 16px;
+    background: var(--blue-light);
+    border: 1px solid rgba(29,111,235,0.2);
+    border-radius: 50px;
+    font-size: 12px; font-weight: 600; color: var(--blue);
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-size: clamp(28px, 4vw, 44px); font-weight: 800;
+    color: var(--blue-dark); margin-bottom: 12px;
+  }
+  .hero h1 span { color: var(--blue); }
+  .hero p { font-size: 16px; color: var(--gray); max-width: 500px; margin: 0 auto; }
+
+  .main { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+
+  .card {
+    background: white; border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 24px rgba(10,22,40,0.05);
+    margin-bottom: 24px; overflow: hidden;
+  }
+  .card-header {
+    padding: 20px 28px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .card-icon {
+    width: 40px; height: 40px; background: var(--blue-light);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .card-header h2 { font-size: 16px; font-weight: 700; color: var(--blue-dark); }
+  .card-header p { font-size: 13px; color: var(--gray); margin-top: 2px; }
+  .card-body { padding: 28px; }
+
+  .form-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: 13px; font-weight: 600; color: var(--blue-dark); }
+  select, input[type="number"] {
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px; color: var(--blue-dark);
+    background: white; outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748B' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+  }
+  input[type="number"] {
+    background-image: none;
+  }
+  select:focus, input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 4px rgba(29,111,235,0.08);
+  }
+
+  .slider-group { display: flex; flex-direction: column; gap: 8px; }
+  .slider-label {
+    display: flex; justify-content: space-between;
+    font-size: 13px; font-weight: 600; color: var(--blue-dark);
+  }
+  .slider-val {
+    font-size: 13px; font-weight: 700; color: var(--blue);
+    background: var(--blue-light); padding: 2px 10px; border-radius: 50px;
+  }
+  input[type="range"] {
+    width: 100%; height: 6px; border-radius: 50px;
+    background: var(--blue-light); outline: none;
+    appearance: none; cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none; width: 18px; height: 18px;
+    background: var(--blue); border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(29,111,235,0.3);
+  }
+
+  .btn-predict {
+    width: 100%; padding: 18px;
+    background: linear-gradient(135deg, var(--blue), #4A9FFF);
+    color: white; border: none; border-radius: 14px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: all 0.3s;
+    box-shadow: 0 8px 30px rgba(29,111,235,0.3);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin-top: 8px;
+  }
+  .btn-predict:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(29,111,235,0.4);
+  }
+
+  /* RESULTS */
+  .results { display: none; }
+  .results.show { display: block; }
+
+  .result-hero {
+    border-radius: 20px; padding: 36px;
+    text-align: center; margin-bottom: 20px;
+    position: relative; overflow: hidden;
+  }
+  .result-hero.high {
+    background: linear-gradient(135deg, #065F46, #10B981);
+  }
+  .result-hero.medium {
+    background: linear-gradient(135deg, #92400E, #F59E0B);
+  }
+  .result-hero.low {
+    background: linear-gradient(135deg, #7F1D1D, #EF4444);
+  }
+  .result-emoji { font-size: 56px; margin-bottom: 12px; }
+  .result-label {
+    font-size: 32px; font-weight: 800; color: white; margin-bottom: 8px;
+  }
+  .result-confidence {
+    font-size: 15px; color: rgba(255,255,255,0.7);
+  }
+  .result-risk {
+    display: inline-flex; margin-top: 16px;
+    padding: 8px 20px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50px;
+    font-size: 14px; font-weight: 700; color: white;
+  }
+
+  .metrics-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px; margin-bottom: 20px;
+  }
+  .metric-card {
+    background: white; border-radius: 16px;
+    border: 1px solid var(--border);
+    padding: 20px; text-align: center;
+  }
+  .metric-val {
+    font-size: 28px; font-weight: 800;
+    color: var(--blue); margin-bottom: 4px;
+  }
+  .metric-lbl { font-size: 12px; color: var(--gray); font-weight: 500; }
+
+  .recs-box {
+    background: white; border-radius: 16px;
+    border: 1px solid var(--border); padding: 24px;
+    margin-bottom: 20px;
+  }
+  .recs-box h3 {
+    font-size: 15px; font-weight: 700;
+    color: var(--blue-dark); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .rec-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px; color: var(--gray); line-height: 1.6;
+  }
+  .rec-item:last-child { border-bottom: none; }
+  .rec-item span { color: var(--blue); font-size: 16px; }
+
+  .btn-again {
+    width: 100%; padding: 16px;
+    background: white; color: var(--blue);
+    border: 2px solid var(--blue); border-radius: 14px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-again:hover { background: var(--blue-light); transform: translateY(-2px); }
+
+  footer {
+    text-align: center; padding: 28px;
+    font-size: 13px; color: var(--gray);
+    border-top: 1px solid var(--border); background: white;
+  }
+  footer a { color: var(--blue); text-decoration: none; font-weight: 600; }
+
+  @media(max-width:600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .metrics-grid { grid-template-columns: 1fr; }
+    header { padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🎓</div>
+    Student<span>Predict</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:8px;">
+    <a href="index.html" style="padding:8px 18px; border-radius:50px; font-size:14px; font-weight:600; color:var(--blue); background:var(--blue-light); border:1.5px solid rgba(29,111,235,0.2); text-decoration:none;">🎯 Predictor</a>
+    <a href="dashboard.html" style="padding:8px 18px; border-radius:50px; font-size:14px; font-weight:600; color:var(--gray); text-decoration:none; border:1.5px solid transparent; transition:all 0.2s;" onmouseover="this.style.color='var(--blue)';this.style.background='var(--blue-light)'" onmouseout="this.style.color='var(--gray)';this.style.background='transparent'">📊 Dashboard</a>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-tag">🤖 Random Forest ML Model · 84% Accuracy</div>
+  <h1>Student Performance <span>Predictor</span></h1>
+  <p>Enter student details to predict academic performance and identify at-risk students early.</p>
+</div>
+
+<div class="main">
+
+  <!-- FORM -->
+  <div id="formSection">
+
+    <!-- Personal Info -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">👤</div>
+        <div><h2>Personal Information</h2><p>Basic student demographics</p></div>
+      </div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="gender">
+              <option value="M">Male</option>
+              <option value="F">Female</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Nationality</label>
+            <select id="NationalITy">
+              <option value="KW">Kuwait</option>
+              <option value="Jordan">Jordan</option>
+              <option value="Palestine">Palestine</option>
+              <option value="Iraq">Iraq</option>
+              <option value="lebanon">Lebanon</option>
+              <option value="Tunis">Tunis</option>
+              <option value="SaudiArabia">Saudi Arabia</option>
+              <option value="Egypt">Egypt</option>
+              <option value="Syria">Syria</option>
+              <option value="USA">USA</option>
+              <option value="Iran">Iran</option>
+              <option value="Lybia">Lybia</option>
+              <option value="Morocco">Morocco</option>
+              <option value="venzuela">Venezuela</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Place of Birth</label>
+            <select id="PlaceofBirth">
+              <option value="KuwaIT">Kuwait</option>
+              <option value="Jordan">Jordan</option>
+              <option value="Palestine">Palestine</option>
+              <option value="Iraq">Iraq</option>
+              <option value="lebanon">Lebanon</option>
+              <option value="Tunis">Tunis</option>
+              <option value="SaudiArabia">Saudi Arabia</option>
+              <option value="Egypt">Egypt</option>
+              <option value="Syria">Syria</option>
+              <option value="USA">USA</option>
+              <option value="Iran">Iran</option>
+              <option value="Lybia">Lybia</option>
+              <option value="Morocco">Morocco</option>
+              <option value="venzuela">Venezuela</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Relation (Primary Contact)</label>
+            <select id="Relation">
+              <option value="Father">Father</option>
+              <option value="Mum">Mother</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Academic Info -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">📚</div>
+        <div><h2>Academic Information</h2><p>Stage, grade and subject details</p></div>
+      </div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Stage</label>
+            <select id="StageID">
+              <option value="lowerlevel">Lower Level</option>
+              <option value="MiddleSchool">Middle School</option>
+              <option value="HighSchool">High School</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Grade</label>
+            <select id="GradeID">
+              <option>G-02</option><option>G-04</option><option>G-05</option>
+              <option>G-06</option><option>G-07</option><option>G-08</option>
+              <option>G-09</option><option>G-10</option><option>G-11</option><option>G-12</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Section</label>
+            <select id="SectionID">
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Topic/Subject</label>
+            <select id="Topic">
+              <option>IT</option><option>Math</option><option>Arabic</option>
+              <option>Science</option><option>English</option><option>Quran</option>
+              <option>Spanish</option><option>French</option><option>History</option>
+              <option>Biology</option><option>Chemistry</option><option>Geology</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Semester</label>
+            <select id="Semester">
+              <option value="F">First</option>
+              <option value="S">Second</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Absence Days</label>
+            <select id="StudentAbsenceDays">
+              <option value="Under-7">Under 7 Days</option>
+              <option value="Above-7">Above 7 Days</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Engagement -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">📊</div>
+        <div><h2>Engagement Metrics</h2><p>Participation and activity scores (0–100)</p></div>
+      </div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Raised Hands</span>
+              <span class="slider-val" id="rhVal">50</span>
+            </div>
+            <input type="range" min="0" max="100" value="50" id="raisedhands"
+              oninput="document.getElementById('rhVal').textContent=this.value">
+          </div>
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Visited Resources</span>
+              <span class="slider-val" id="vrVal">50</span>
+            </div>
+            <input type="range" min="0" max="100" value="50" id="VisITedResources"
+              oninput="document.getElementById('vrVal').textContent=this.value">
+          </div>
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Announcements Viewed</span>
+              <span class="slider-val" id="avVal">50</span>
+            </div>
+            <input type="range" min="0" max="100" value="50" id="AnnouncementsView"
+              oninput="document.getElementById('avVal').textContent=this.value">
+          </div>
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Discussion Participation</span>
+              <span class="slider-val" id="dVal">50</span>
+            </div>
+            <input type="range" min="0" max="100" value="50" id="Discussion"
+              oninput="document.getElementById('dVal').textContent=this.value">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Parent Info -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">👪</div>
+        <div><h2>Parent Involvement</h2><p>Parent engagement with school</p></div>
+      </div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Parent Answering Survey</label>
+            <select id="ParentAnsweringSurvey">
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Parent School Satisfaction</label>
+            <select id="ParentschoolSatisfaction">
+              <option value="Good">Good</option>
+              <option value="Bad">Bad</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-predict" onclick="predict()">
+      🎯 Predict Student Performance
+    </button>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results" id="results">
+    <div class="result-hero" id="resultHero">
+      <div class="result-emoji" id="resultEmoji"></div>
+      <div class="result-label" id="resultLabel"></div>
+      <div class="result-confidence" id="resultConf"></div>
+      <div class="result-risk" id="resultRisk"></div>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-val" id="mRaised">-</div>
+        <div class="metric-lbl">Raised Hands</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" id="mResources">-</div>
+        <div class="metric-lbl">Resources Visited</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" id="mDiscussion">-</div>
+        <div class="metric-lbl">Discussion Score</div>
+      </div>
+    </div>
+
+    <div class="recs-box">
+      <h3>💡 Recommendations</h3>
+      <div id="recsList"></div>
+    </div>
+
+    <button class="btn-again" onclick="resetForm()">↩ Predict Another Student</button>
+  </div>
+
+</div>
+
+<footer>
+  Built by <a href="https://github.com/vyshnavichaganti" target="_blank">Vyshnavi Chaganti</a> ·
+  <a href="https://vyshnavichaganti.netlify.app" target="_blank">Portfolio</a> ·
+  Random Forest · 84% Accuracy
+</footer>
+
+<script>
+  const API = 'http://localhost:8000';
+
+  async function predict() {
+    const data = {
+      gender: document.getElementById('gender').value,
+      NationalITy: document.getElementById('NationalITy').value,
+      PlaceofBirth: document.getElementById('PlaceofBirth').value,
+      StageID: document.getElementById('StageID').value,
+      GradeID: document.getElementById('GradeID').value,
+      SectionID: document.getElementById('SectionID').value,
+      Topic: document.getElementById('Topic').value,
+      Semester: document.getElementById('Semester').value,
+      Relation: document.getElementById('Relation').value,
+      raisedhands: parseInt(document.getElementById('raisedhands').value),
+      VisITedResources: parseInt(document.getElementById('VisITedResources').value),
+      AnnouncementsView: parseInt(document.getElementById('AnnouncementsView').value),
+      Discussion: parseInt(document.getElementById('Discussion').value),
+      ParentAnsweringSurvey: document.getElementById('ParentAnsweringSurvey').value,
+      ParentschoolSatisfaction: document.getElementById('ParentschoolSatisfaction').value,
+      StudentAbsenceDays: document.getElementById('StudentAbsenceDays').value
+    };
+
+    try {
+      const res = await fetch(`${API}/predict`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      showResults(result, data);
+    } catch(err) {
+      alert('Cannot connect to API! Make sure backend is running on localhost:8000');
+    }
+  }
+
+  function showResults(result, data) {
+    document.getElementById('formSection').style.display = 'none';
+    document.getElementById('results').classList.add('show');
+
+    const hero = document.getElementById('resultHero');
+    const emojis = {0: '⚠️', 1: '📈', 2: '🏆'};
+    const classes = {0: 'low', 1: 'medium', 2: 'high'};
+
+    hero.className = `result-hero ${classes[result.prediction]}`;
+    document.getElementById('resultEmoji').textContent = emojis[result.prediction];
+    document.getElementById('resultLabel').textContent = result.label;
+    document.getElementById('resultConf').textContent = `Confidence: ${result.confidence}%`;
+    document.getElementById('resultRisk').textContent = result.risk_level;
+
+    document.getElementById('mRaised').textContent = data.raisedhands;
+    document.getElementById('mResources').textContent = data.VisITedResources;
+    document.getElementById('mDiscussion').textContent = data.Discussion;
+
+    const recsList = document.getElementById('recsList');
+    recsList.innerHTML = result.recommendations
+      .map(r => `<div class="rec-item"><span>→</span><span>${r}</span></div>`)
+      .join('');
+  }
+
+  function resetForm() {
+    document.getElementById('formSection').style.display = 'block';
+    document.getElementById('results').classList.remove('show');
+  }
+</script>
+</body>
+</html>
