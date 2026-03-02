@@ -1,6 +1,6 @@
 📊 Student Performance Analytics & Prediction System
-
-An end-to-end Data Analytics + Machine Learning project that analyzes student academic performance, identifies key influencing factors, and predicts student outcomes using real educational data.
+End-to-end Random Forest ML pipeline with Power BI dashboard to identify at-risk students (84% accuracy)
+ using real educational data.
 
 🚀 Project Objective
 
@@ -82,3 +82,4 @@ Enhance academic support systems
 Vyshnavi Chaganti
 CSE (AI & ML) Student
 Aspiring Data Analyst | Machine Learning Enthusiast
+
